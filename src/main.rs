@@ -11,6 +11,7 @@ fn main() {
         (@subcommand spectrogram =>
             (about: "Generates a spectrogram from a wavetable")
             (@arg INPUT: +required "The wavetable to analyze")
+            (@arg phase: -p --phase "Include phase information as color")
         )
         (@subcommand factor =>
             (about: "Factors a wavetable into its prime-multiple-of-fundamental components")
