@@ -3,7 +3,7 @@
 wavetool is a processing/analysis tool for Serum wavetables. It can:
 
 - Generate a spectrogram from a wavetable.
-- Filter harmonics in various ways:
+- Filter a wavetable's harmonics in various ways:
     - Keep only the even/odd harmonics.
     - Specify a bitmap of harmonics to keep.
     - Specify a repeating pattern of harmonics to keep.
