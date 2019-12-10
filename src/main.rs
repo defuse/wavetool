@@ -4,7 +4,7 @@ extern crate clap;
 
 fn main() {
 
-   let matches = clap_app!(waveutil =>
+   let matches = clap_app!(wavetool =>
         (version: "0.0.1")
         (author: "Taylor Hornby <taylor@defuse.ca>")
         (about: "Serum wavetable editing / analysis tool.")

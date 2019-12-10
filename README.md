@@ -1,6 +1,6 @@
-# waveutil
+# wavetool
 
-`waveutil` is a processing/analysis tool for Serum wavetables. It can:
+wavetool is a processing/analysis tool for Serum wavetables. It can:
 
 - Generate spectrograms
 - Filter harmonics in various ways:

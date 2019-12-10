@@ -1,5 +1,5 @@
 [package]
-name = "waveutil"
+name = "wavetool"
 version = "0.1.0"
 authors = ["Taylor Hornby <taylor@defuse.ca>"]
 edition = "2018"
