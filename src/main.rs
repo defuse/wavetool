@@ -29,7 +29,7 @@ fn main() {
             (@arg PATTERN: -p --pattern +takes_value "Repeat a bitmap up the spectrum")
             (@arg KEEP_PRIMES: -k --keepprimes +takes_value "Keep only a set of prime-factorization tree branches")
             (@arg REMOVE_PRIMES: -r --removeprimes +takes_value "Remove a set of prime-factorization tree branches")
-            (@arg protect: -f --fundamental "Protect the fundamental (overrides other filters)")
+            (@arg fundamental: -f --fundamental "Protect the fundamental (overrides other filters)")
             (@arg normalize: -n --normalize "Normalize the output")
         )
     )
