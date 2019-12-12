@@ -1,33 +1,16 @@
 #[macro_use]
 extern crate clap;
 
-#[derive(Debug)]
-struct SpectrogramArgs {
-    input_file: String,
-    phase: bool
-}
+mod spectrogram;
+use spectrogram::{SpectrogramArgs, run_spectrogram};
 
-#[derive(Debug)]
-struct FactorArgs {
-    input_file: String,
-    normalize: bool,
-    recursive: bool,
-    shift: bool
-}
+mod factor;
+use factor::{FactorArgs, run_factor};
 
-#[derive(Debug)]
-struct FilterArgs {
-    input_file: String,
-    output_file: String,
-    keep_even: bool,
-    keep_odd: bool,
-    keep_bitmap: Option<String>,
-    keep_pattern: Option<String>,
-    remove_primes: Option<String>,
-    keep_primes: Option<String>,
-    protect_fundamental: bool,
-    normalize: bool
-}
+mod filter;
+use filter::{FilterArgs, run_filter};
+
+mod wavetable;
 
 fn main() {
 
@@ -93,18 +76,4 @@ fn main() {
         };
         run_filter(&filter_args);
     }
-}
-
-fn run_spectrogram(args: &SpectrogramArgs) -> () {
-    println!("{:?}", args);
-}
-
-fn run_factor(args: &FactorArgs) -> () {
-    println!("{:?}", args);
-
-}
-
-fn run_filter(args: &FilterArgs) -> () {
-    println!("{:?}", args);
-
 }

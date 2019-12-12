@@ -8,3 +8,6 @@ edition = "2018"
 
 [dependencies]
 clap = "2"
+hound = "3.4.0"
+rustfft = "3.0.0"
+primes = "0.2.3"
