@@ -1,7 +1,4 @@
 use crate::wavetable::{WaveTable, PARTIAL_COUNT};
-use std::path::Path;
-use std::fs::File;
-use std::io::BufWriter;
 use hsl::HSL;
 use rustfft::num_complex::Complex32;
 
@@ -27,6 +24,7 @@ pub fn run_spectrogram(args: &SpectrogramArgs) -> () {
 
     for (i, cycle) in spectrogram.cycles.iter().enumerate() {
         for (j, partial) in cycle.partials.iter().enumerate() {
+            assert!(NUM_PARTIALS_WE_CARE_ABOUT <= PARTIAL_COUNT);
             if j >= NUM_PARTIALS_WE_CARE_ABOUT {
                 break;
             }
