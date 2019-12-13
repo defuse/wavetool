@@ -2,6 +2,8 @@ use crate::wavetable::{WaveTable, PARTIAL_COUNT};
 use std::path::Path;
 use std::fs::File;
 use std::io::BufWriter;
+use hsl::HSL;
+use rustfft::num_complex::Complex32;
 
 const PIXEL_SIZE: u32 = 10;
 // Serum only lets you edit up to 512, so the rest don't matter (+ DC offset)
@@ -24,19 +26,24 @@ pub fn run_spectrogram(args: &SpectrogramArgs) -> () {
     );
 
     for (i, cycle) in spectrogram.cycles.iter().enumerate() {
-        for (j, ampl) in cycle.partials.iter().map(|c| c.norm()).enumerate() {
+        for (j, partial) in cycle.partials.iter().enumerate() {
             if j >= NUM_PARTIALS_WE_CARE_ABOUT {
                 break;
             }
             for k in 0..PIXEL_SIZE {
                 for m in 0..PIXEL_SIZE {
+                    let (r,g,b) = if args.phase {
+                        get_pixel_with_phase(partial)
+                    } else {
+                        // delete phase information if they don't want it
+                        get_pixel_no_phase(partial)
+                    };
+                    
                     imgbuf.put_pixel(
                         i as u32 * PIXEL_SIZE + k,
                         // flip it so it goes low->high from bottom->top
                         (NUM_PARTIALS_WE_CARE_ABOUT as u32 - j as u32 - 1) * PIXEL_SIZE + m,
-                        image::Rgb([get_red(ampl),
-                        get_green(ampl),
-                        get_blue(ampl)])
+                        image::Rgb([r,g,b])
                     );
                 }
             }
@@ -47,20 +54,20 @@ pub fn run_spectrogram(args: &SpectrogramArgs) -> () {
     imgbuf.save(path_str).unwrap();
 }
 
-fn get_red(ampl: f32) -> u8 {
-    get_pixel(ampl)
-}
 
-fn get_green(ampl: f32) -> u8 {
-    get_pixel(ampl)
-}
-
-fn get_blue(ampl: f32) -> u8 {
-    get_pixel(ampl)
-}
-
-fn get_pixel(ampl: f32) -> u8 {
+fn get_pixel_with_phase(partial: &Complex32) -> (u8, u8, u8) {
+    let power = partial.norm() * partial.norm();
     // brightness decreases by 2 for every -1db, will saturate at 0 below -127db
     // FIXME: this is fucked
-    (255.0 + 20.0*(ampl*ampl).log10()*2.0).max(0.0) as u8
+    let luminosity = (255.0 + 20.0*(power).log10()*2.0).max(0.0) / 255.0;
+    let hue = partial.arg() / std::f32::consts::PI * 180.0;
+    let color = HSL { h: hue as f64, s: 1_f64, l: luminosity as f64};
+    color.to_rgb()
+}
+
+fn get_pixel_no_phase(partial: &Complex32) -> (u8, u8, u8) {
+    // FIXME: deduplicate this
+    let power = partial.norm() * partial.norm();
+    let luminosity = (255.0 + 20.0*(power).log10()*2.0).max(0.0) as u8;
+    (luminosity, luminosity, luminosity)
 }
