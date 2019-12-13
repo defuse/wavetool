@@ -59,11 +59,15 @@ impl WaveTable {
 
         let mut writer = hound::WavWriter::create(path, spec).unwrap();
 
+        let mut n = 0;
         for cycle in self.cycles.iter() {
             for sample in cycle.samples.iter() {
+                n += 1;
                 writer.write_sample(*sample).unwrap();
             }
         }
+
+        println!("n: {}", n);
     }
 
     pub fn normalize(&self) -> WaveTable {
@@ -77,7 +81,7 @@ impl WaveCycle {
         let mut input: Vec<Complex<f32>> = self.samples.iter().map(|s| Complex { re: *s, im: 0.0 } ).collect();
 
         let mut partials = WaveCyclePartials { partials: [Complex::zero(); WAVE_SAMPLES] };
-        let mut planner = FFTplanner::new(true);
+        let mut planner = FFTplanner::new(false);
         let fft = planner.plan_fft(WAVE_SAMPLES);
         fft.process(&mut input, &mut partials.partials);
 
@@ -102,11 +106,15 @@ impl WaveCyclePartials {
         let mut input = self.partials.clone();
         let mut output = vec![Complex::zero(); WAVE_SAMPLES];
         
-        let mut planner = FFTplanner::new(false);
+        let mut planner = FFTplanner::new(true);
         let fft = planner.plan_fft(WAVE_SAMPLES);
         fft.process(&mut input, &mut output);
 
         let mut cycle = WaveCycle { samples: [0.0; WAVE_SAMPLES] };
+        // FIXME: after making edits in the frequency domain, imaginary components in the time domain show up
+
+        let im_parts: Vec<f32> = output.iter().map(|c| c.im).collect();
+        println!("IM COMPS {:?}", im_parts);
         let real_parts: Vec<f32> = output.iter().map(|c| c.re).collect();
         cycle.samples.copy_from_slice(&real_parts[..WAVE_SAMPLES]);
 
@@ -119,4 +127,39 @@ impl WaveCyclePartials {
         }
         println!("");
     }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::wavetable::*;
+    use float_cmp::approx_eq;
+
+    #[test]
+    fn test_fft_fft() {
+        let saw = &WaveTable::load_from_wav("wavetables/saw.wav").cycles[0];
+        let saw2 = saw.fft().fft();
+        for (a, b) in saw.samples.iter().zip(saw2.samples.iter()) {
+            assert!(approx_eq!(f32, *a, *b, epsilon=0.0001));
+        }
+    }
+
+    #[test]
+    fn test_fft_edit_fft() {
+        let saw = &WaveTable::load_from_wav("wavetables/saw.wav").cycles[0];
+        let mut partials = saw.fft();
+
+        for i in 1..WAVE_SAMPLES {
+            if i % 3 == 0 || i % 2 == 0 {
+                partials.partials[i] = Complex::zero();
+            }
+        }
+
+        let partials2 = partials.fft().fft();
+
+        for (a, b) in partials.partials.iter().zip(partials2.partials.iter()) {
+            println!("{}, {}", a.norm(), b.norm());
+            assert!(approx_eq!(f32, a.norm(), b.norm(), epsilon=0.0001));
+        }
+    }
+
 }

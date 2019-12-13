@@ -3,6 +3,7 @@ use primes::PrimeSet;
 use rustfft::num_complex::Complex;
 use rustfft::num_traits::Zero;
 
+
 const BIGGEST_USEFUL_PRIME : u64 = 43;
 
 #[derive(Debug)]
@@ -17,9 +18,10 @@ pub struct FactorArgs {
 impl WaveCyclePartials {
     fn filter_for_p(&self, p: u64) -> WaveCyclePartials {
         let mut filtered = WaveCyclePartials { partials: [Complex::zero(); WAVE_SAMPLES] };
-        for i in 0..WAVE_SAMPLES {
-            if (i+1) as u64 % p == 0 && !divisible_by_prime_less_than((i+1) as u64, p) {
-                println!("{} for {}", i+1, p);
+        // leave DC component at zero
+        for i in 1..WAVE_SAMPLES {
+            if i as u64 % p == 0 && !divisible_by_prime_less_than(i as u64, p) {
+                //println!("{} for {}", i, p);
                 filtered.partials[i] = self.partials[i];
             } else {
                 filtered.partials[i] = Complex::zero();
@@ -48,7 +50,7 @@ pub fn run_factor(args: &FactorArgs) -> () {
     
     let mut pset = PrimeSet::new();
     for p in pset.iter() {
-        assert!(BIGGEST_USEFUL_PRIME <= WAVE_SAMPLES as u64);
+        assert!(BIGGEST_USEFUL_PRIME < WAVE_SAMPLES as u64);
         if p > BIGGEST_USEFUL_PRIME as u64 {
             break;
         }
@@ -59,9 +61,10 @@ pub fn run_factor(args: &FactorArgs) -> () {
             let mut partials = wtp.cycles[i].fft();
             partials = partials.filter_for_p(p);
 
-            if args.shift {
-                for j in 0..WAVE_SAMPLES {
-                    let index = j + p as usize - 1;
+            if args.shift { 
+                // leave DC component untouched
+                for j in 1..WAVE_SAMPLES {
+                    let index = j * p as usize;
                     partials.partials[j] = if index < WAVE_SAMPLES {
                         partials.partials[index]
                     } else {
@@ -70,12 +73,18 @@ pub fn run_factor(args: &FactorArgs) -> () {
                 }
             }
 
+            //println!("FOR PRIME {}, PARTIAL 5 IS {}", p, partials.partials[5]);
+            //println!("AGAIN");
+            //println!("FOR PRIME {}, PARTIAL 5 IS {}", p, partials.fft().fft().partials[5]);
+
             wtp.cycles[i] = partials.fft();
         }
 
         if args.normalize {
             wtp = wtp.normalize();
         }
+
+        assert!(wtp.cycles.len() == wt.cycles.len());
 
         let output_path = format!(
             "{}.{}{}p{:02}.wav", 
