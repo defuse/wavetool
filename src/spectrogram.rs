@@ -29,11 +29,11 @@ pub fn run_spectrogram(args: &SpectrogramArgs) -> () {
                 break;
             }
             for k in 0..PIXEL_SIZE {
-                for l in 0..PIXEL_SIZE {
+                for m in 0..PIXEL_SIZE {
                     imgbuf.put_pixel(
                         i as u32 * PIXEL_SIZE + k,
                         // flip it so it goes low->high from bottom->top
-                        (NUM_PARTIALS_WE_CARE_ABOUT as u32 - j as u32 - 1) * PIXEL_SIZE + l,
+                        (NUM_PARTIALS_WE_CARE_ABOUT as u32 - j as u32 - 1) * PIXEL_SIZE + m,
                         image::Rgb([get_red(ampl),
                         get_green(ampl),
                         get_blue(ampl)])
