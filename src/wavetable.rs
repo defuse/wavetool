@@ -75,8 +75,30 @@ impl WaveTable {
     }
 
     pub fn normalize(&self) -> WaveTable {
-        // TODO: implement normalization (same gain applied across the whole table)
-        self.clone()
+        let mut normalized = self.clone();
+        let mut gain = std::f32::INFINITY;
+
+        // Find the smallest gain that will bring at least one sample to unity.
+        for cycle in normalized.cycles.iter() {
+            for sample in cycle.samples.iter() {
+                // FIXME: This can probably cause slight clipping due to floating point error.
+                let gain_for_sample = 1.0 / sample;
+                if gain_for_sample < gain {
+                    gain = gain_for_sample;
+                }
+            }
+        }
+
+        assert!(gain != std::f32::INFINITY);
+
+        // Apply the gain
+        for cycle in &mut normalized.cycles {
+            for i in 0..cycle.samples.len() {
+                cycle.samples[i] *= gain;
+            }
+        }
+
+        normalized
     }
 
     pub fn to_spectrogram(&self) -> WaveSpectrogram {
