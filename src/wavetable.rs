@@ -90,7 +90,7 @@ impl WaveCycle {
         // When working with real signals, the output of an FFT has some redundancy, see:
         // https://math.stackexchange.com/questions/867337/how-to-interpret-the-imaginary-part-of-an-inverse-fourier-transform
         //
-        // We compute the FFT, then throw away the redundant part, keeping only the partials for easy editing.WAVE_SAMPLES
+        // We compute the FFT, then throw away the redundant part, keeping only the partials for easy editing.
         // The part we're throwing away is just the conjugate of the part we're keeping, so we can recover it later.
 
         let mut input: Vec<Complex<f32>> = self.samples.iter().map(|s| Complex { re: *s, im: 0.0 } ).collect();
