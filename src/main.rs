@@ -66,7 +66,7 @@ fn main() {
             output_file: matches.value_of("OUTPUT").unwrap().to_string(),
             keep_even: matches.is_present("even"),
             keep_odd: matches.is_present("odd"),
-            // .map calls convert Option<&str> into Option<String>.
+            // These .map calls convert Option<&str> into Option<String>.
             keep_bitmap: matches.value_of("bitmap").map(String::from),
             keep_pattern: matches.value_of("pattern").map(String::from),
             keep_primes: matches.value_of("keepprimes").map(String::from),

@@ -13,6 +13,10 @@ pub struct WaveTable {
     pub cycles: Vec<WaveCycle>
 }
 
+pub struct WaveSpectrogram {
+    pub cycles: Vec<WaveCyclePartials>
+}
+
 #[derive(Clone)]
 pub struct WaveCycle {
     pub samples: [f32; WAVE_SAMPLES]
@@ -73,6 +77,10 @@ impl WaveTable {
     pub fn normalize(&self) -> WaveTable {
         // TODO: implement normalization (same gain applied across the whole table)
         self.clone()
+    }
+
+    pub fn to_spectrogram(&self) -> WaveSpectrogram {
+        WaveSpectrogram { cycles: self.cycles.iter().map(|cycle| cycle.fft()).collect() }
     }
 }
 
