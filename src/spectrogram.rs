@@ -54,18 +54,21 @@ pub fn run_spectrogram(args: &SpectrogramArgs) -> () {
 
 
 fn get_pixel_with_phase(partial: &Complex32) -> (u8, u8, u8) {
-    let power = partial.norm() * partial.norm();
-    // brightness decreases by 2 for every -1db, will saturate at 0 below -127db
-    // FIXME: this is fucked
-    let luminosity = (255.0 + 20.0*(power).log10()*2.0).max(0.0) / 255.0;
+    let luminosity = get_luminosity(partial);
     let hue = partial.arg() / std::f32::consts::PI * 180.0;
     let color = HSL { h: hue as f64, s: 1_f64, l: luminosity as f64};
     color.to_rgb()
 }
 
 fn get_pixel_no_phase(partial: &Complex32) -> (u8, u8, u8) {
-    // FIXME: deduplicate this
+    let luminosity = get_luminosity(partial);
+    let color = HSL { h: 0_f64, s: 0_f64, l: luminosity as f64};
+    color.to_rgb()
+}
+
+fn get_luminosity(partial: &Complex32) -> f32 {
+    // brightness decreases by 2 for every -1db, will saturate at black below -127db
+    // there's no real reason here, just fuck with the code until it looks right
     let power = partial.norm() * partial.norm();
-    let luminosity = (255.0 + 20.0*(power).log10()*2.0).max(0.0) as u8;
-    (luminosity, luminosity, luminosity)
+    (255.0 + 20.0*(power).log10()*2.0).max(0.0) / 255.0
 }
