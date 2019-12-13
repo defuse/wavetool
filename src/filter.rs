@@ -1,4 +1,4 @@
-use crate::wavetable::{WaveTable, WaveCyclePartials, WAVE_SAMPLES, PARTIAL_COUNT};
+use crate::wavetable::{WaveTable};
 use rustfft::num_complex::Complex;
 use rustfft::num_traits::Zero;
 
