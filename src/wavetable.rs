@@ -1,4 +1,7 @@
+// Serum et al. use 2048 samples to represent a single cycle.
 pub const WAVE_SAMPLES: usize = 2048;
+// DC offset + 1024 partials.
+pub const PARTIAL_COUNT: usize = 1025;
 
 use rustfft::FFTplanner;
 use rustfft::num_complex::Complex;
@@ -17,7 +20,7 @@ pub struct WaveCycle {
 
 #[derive(Clone)]
 pub struct WaveCyclePartials {
-    pub partials: [Complex<f32>; WAVE_SAMPLES]
+    pub partials: [Complex<f32>; PARTIAL_COUNT]
 }
 
 impl WaveTable {
@@ -59,35 +62,40 @@ impl WaveTable {
 
         let mut writer = hound::WavWriter::create(path, spec).unwrap();
 
-        let mut n = 0;
         for cycle in self.cycles.iter() {
             for sample in cycle.samples.iter() {
-                n += 1;
                 writer.write_sample(*sample).unwrap();
             }
         }
 
-        println!("n: {}", n);
     }
 
     pub fn normalize(&self) -> WaveTable {
-        // TODO: implement normalization
+        // TODO: implement normalization (same gain applied across the whole table)
         self.clone()
     }
 }
 
 impl WaveCycle {
     pub fn fft(&self) -> WaveCyclePartials {
+
+        // When working with real signals, the output of an FFT has some redundancy, see:
+        // https://math.stackexchange.com/questions/867337/how-to-interpret-the-imaginary-part-of-an-inverse-fourier-transform
+        //
+        // We compute the FFT, then throw away the redundant part, keeping only the partials for easy editing.WAVE_SAMPLES
+        // The part we're throwing away is just the conjugate of the part we're keeping, so we can recover it later.
+
         let mut input: Vec<Complex<f32>> = self.samples.iter().map(|s| Complex { re: *s, im: 0.0 } ).collect();
 
-        let mut partials = WaveCyclePartials { partials: [Complex::zero(); WAVE_SAMPLES] };
         let mut planner = FFTplanner::new(false);
         let fft = planner.plan_fft(WAVE_SAMPLES);
-        fft.process(&mut input, &mut partials.partials);
+        let mut frequency_domain = [Complex::<f32>::zero(); WAVE_SAMPLES];
+        fft.process(&mut input, &mut frequency_domain);
 
-        // For some reason you have to divide by the number of samples.
+        let mut partials = WaveCyclePartials { partials: [Complex::<f32>::zero(); PARTIAL_COUNT]};
         for i in 0..partials.partials.len() {
-            partials.partials[i] /= WAVE_SAMPLES as f32;
+             // We have to normalize by dividing by the number of samples.
+            partials.partials[i] = frequency_domain[i] / (WAVE_SAMPLES as f32);
         }
         
         partials
@@ -103,18 +111,25 @@ impl WaveCycle {
 
 impl WaveCyclePartials {
     pub fn fft(&self) -> WaveCycle {
-        let mut input = self.partials.clone();
+        let mut input = self.partials.to_vec();
         let mut output = vec![Complex::zero(); WAVE_SAMPLES];
+
+        // Rebuild the symmetric/conjugate part of the frequency domain which we threw away.
+        for i in 1..WAVE_SAMPLES/2 {
+            input.push(input[WAVE_SAMPLES/2-i].conj());
+        }
         
         let mut planner = FFTplanner::new(true);
         let fft = planner.plan_fft(WAVE_SAMPLES);
         fft.process(&mut input, &mut output);
 
         let mut cycle = WaveCycle { samples: [0.0; WAVE_SAMPLES] };
-        // FIXME: after making edits in the frequency domain, imaginary components in the time domain show up
 
-        let im_parts: Vec<f32> = output.iter().map(|c| c.im).collect();
-        println!("IM COMPS {:?}", im_parts);
+        // There should never be a significant imaginary component.
+        for c in output.iter() {
+            assert!(c.im.abs() < 0.000001);
+        }
+
         let real_parts: Vec<f32> = output.iter().map(|c| c.re).collect();
         cycle.samples.copy_from_slice(&real_parts[..WAVE_SAMPLES]);
 
@@ -148,7 +163,7 @@ mod test {
         let saw = &WaveTable::load_from_wav("wavetables/saw.wav").cycles[0];
         let mut partials = saw.fft();
 
-        for i in 1..WAVE_SAMPLES {
+        for i in 1..partials.partials.len() {
             if i % 3 == 0 || i % 2 == 0 {
                 partials.partials[i] = Complex::zero();
             }

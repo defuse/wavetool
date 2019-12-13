@@ -1,8 +1,7 @@
-use crate::wavetable::{WaveTable, WaveCycle, WaveCyclePartials, WAVE_SAMPLES};
+use crate::wavetable::{WaveTable, WaveCyclePartials, WAVE_SAMPLES, PARTIAL_COUNT};
 use primes::PrimeSet;
 use rustfft::num_complex::Complex;
 use rustfft::num_traits::Zero;
-
 
 const BIGGEST_USEFUL_PRIME : u64 = 43;
 
@@ -17,11 +16,10 @@ pub struct FactorArgs {
 
 impl WaveCyclePartials {
     fn filter_for_p(&self, p: u64) -> WaveCyclePartials {
-        let mut filtered = WaveCyclePartials { partials: [Complex::zero(); WAVE_SAMPLES] };
+        let mut filtered = WaveCyclePartials { partials: [Complex::zero(); PARTIAL_COUNT] };
         // leave DC component at zero
-        for i in 1..WAVE_SAMPLES {
+        for i in 1..filtered.partials.len() {
             if i as u64 % p == 0 && !divisible_by_prime_less_than(i as u64, p) {
-                //println!("{} for {}", i, p);
                 filtered.partials[i] = self.partials[i];
             } else {
                 filtered.partials[i] = Complex::zero();
@@ -63,19 +61,15 @@ pub fn run_factor(args: &FactorArgs) -> () {
 
             if args.shift { 
                 // leave DC component untouched
-                for j in 1..WAVE_SAMPLES {
+                for j in 1..partials.partials.len() {
                     let index = j * p as usize;
-                    partials.partials[j] = if index < WAVE_SAMPLES {
+                    partials.partials[j] = if index < PARTIAL_COUNT {
                         partials.partials[index]
                     } else {
                         Complex::zero()
                     }
                 }
             }
-
-            //println!("FOR PRIME {}, PARTIAL 5 IS {}", p, partials.partials[5]);
-            //println!("AGAIN");
-            //println!("FOR PRIME {}, PARTIAL 5 IS {}", p, partials.fft().fft().partials[5]);
 
             wtp.cycles[i] = partials.fft();
         }
