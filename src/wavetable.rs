@@ -7,10 +7,12 @@ use rustfft::FFTplanner;
 use rustfft::num_complex::Complex;
 use rustfft::num_traits::Zero;
 use hound;
+use std::io::Read;
 
 #[derive(Clone)]
 pub struct WaveTable {
-    pub cycles: Vec<WaveCycle>
+    pub cycles: Vec<WaveCycle>,
+    clm_chunk: Option<Vec<u8>>
 }
 
 pub struct WaveSpectrogram {
@@ -29,19 +31,51 @@ pub struct WaveCyclePartials {
 
 impl WaveTable {
     pub fn load_from_wav(path: &str) -> WaveTable {
-        let mut reader = hound::WavReader::open(path).unwrap();
-        let spec = reader.spec();
-        if spec.channels != 1 {
-            panic!("Invalid wavetable: file is not mono.");
+        let file = std::fs::File::open(path).unwrap();
+        let buf_reader = std::io::BufReader::new(file);
+        let mut chunk_reader = hound::ChunksReader::new(buf_reader).unwrap();
+
+        let mut clm_chunk: Option<Vec<u8>> = None;
+
+        // This only works if the 'clm ' chunk comes before the data.
+        // FIXME: Fix that. I was running into problems with the borrow checker and gave up.
+        while let Ok(Some(chunk)) = chunk_reader.next() {
+            match chunk {
+                hound::Chunk::Data => {
+                    break;
+                }
+                hound::Chunk::Fmt(_) => { },
+                hound::Chunk::Fact => { },
+                hound::Chunk::Unknown(chars, mut reader) => {
+                    if (chars[0],chars[1],chars[2],chars[3]) == ('c' as u8, 'l' as u8, 'm' as u8, ' ' as u8) {
+                        let mut buffer = [0u8; 128];
+                        let length = reader.read(&mut buffer).unwrap();
+                        clm_chunk = Some(buffer[0..length].to_vec());
+                    }
+                }
+            };
         }
 
-        let samples : Vec<f32> = reader.samples::<f32>().map(Result::unwrap).collect();
+        // Will throw an error if the above loop didn't leave it in a data section
+        let samples: Vec<f32> = chunk_reader.samples::<f32>().map(Result::unwrap).collect();
+
+        // I'm basically copying the implementation of WavReader here.
+        if let Some(spec_ex) = chunk_reader.spec_ex {
+            if spec_ex.spec.channels != 1 {
+                panic!("Invalid wavetable: file is not mono.");
+            }
+        } else {
+            panic!("Wave file has no fmt header.");
+        }
+
+        let mut wavetable = WaveTable {
+            cycles: Vec::<WaveCycle>::new(),
+            clm_chunk: clm_chunk
+        };
+
         if samples.len() == 0 || (samples.len() % WAVE_SAMPLES) != 0 {
             panic!("Invalid wavetable: bad number of samples (empty or not a multiple of 2048)");
         }
-
-        let mut wavetable = WaveTable { cycles: Vec::<WaveCycle>::new() };
-
         let num_cycles = samples.len() / WAVE_SAMPLES;
         for cycle in 0..num_cycles {
             let mut wavecycle = WaveCycle { samples: [0.0; WAVE_SAMPLES] };

@@ -8,7 +8,8 @@ edition = "2018"
 
 [dependencies]
 clap = "2"
-hound = "3.4.0"
+# ChunksReader is only public on master, hasn't been released yet.
+hound = { git = "https://github.com/ruuda/hound.git" }
 rustfft = "3.0.0"
 primes = "0.2.3"
 float-cmp = "0.6.0"
