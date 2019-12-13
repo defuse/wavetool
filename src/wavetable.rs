@@ -8,6 +8,7 @@ use rustfft::num_complex::Complex;
 use rustfft::num_traits::Zero;
 use hound;
 use std::io::Read;
+use std::io::Write;
 
 #[derive(Clone)]
 pub struct WaveTable {
@@ -98,11 +99,24 @@ impl WaveTable {
             sample_format: hound::SampleFormat::Float,
         };
 
-        let mut writer = hound::WavWriter::create(path, spec).unwrap();
+        let file = std::fs::File::create(path).unwrap();
+        let buf_writer = std::io::BufWriter::new(file);
+        let mut chunks_writer = hound::ChunksWriter::new(buf_writer).unwrap();
+        chunks_writer.write_fmt(spec).unwrap();
+
+        if let Some(clm_chunk) = &self.clm_chunk {
+            println!("writing serum data");
+            let mut writer = chunks_writer.start_chunk(['c' as u8, 'l' as u8, 'm' as u8, ' ' as u8]).unwrap();
+            let written_len = writer.write(&clm_chunk).unwrap();
+            assert!(written_len == clm_chunk.len());
+            writer.finalize().unwrap();
+        }
+
+        chunks_writer.start_data_chunk().unwrap();
 
         for cycle in self.cycles.iter() {
             for sample in cycle.samples.iter() {
-                writer.write_sample(*sample).unwrap();
+                chunks_writer.write_sample(*sample).unwrap();
             }
         }
 
