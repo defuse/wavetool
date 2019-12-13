@@ -54,7 +54,7 @@ pub fn run_factor(args: &FactorArgs) -> () {
         }
 
         let mut wtp = wt.clone();
-        for i in 0..wt.cycles.len() {
+        for i in 0..wtp.cycles.len() {
 
             let mut partials = wtp.cycles[i].fft();
             partials = partials.filter_for_p(p);

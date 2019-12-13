@@ -33,13 +33,10 @@ fn main() {
         (@subcommand filter =>
             (about: "Filter harmonics in various ways.")
             (@arg INPUT: +required "The wavetable to be filtered")
-            (@arg OUTPUT: +required "Output file")
             (@arg even: -e --even "Keep only the even harmonics")
             (@arg odd: -o --odd "Keep only the odd harmonics")
             (@arg bitmap: -b --bitmap +takes_value "Keep only the harmonics specified by a bitmap.")
             (@arg pattern: -p --pattern +takes_value "Repeat a bitmap up the spectrum")
-            (@arg keep_primes: -k --keepprimes +takes_value "Keep only a set of prime-factorization tree branches")
-            (@arg remove_primes: -r --removeprimes +takes_value "Remove a set of prime-factorization tree branches")
             (@arg fundamental: -f --fundamental "Protect the fundamental (overrides other filters)")
             (@arg normalize: -n --normalize "Normalize the output")
         )
@@ -63,14 +60,11 @@ fn main() {
     } else if let Some(matches) = matches.subcommand_matches("filter") {
         let filter_args = FilterArgs {
             input_file: matches.value_of("INPUT").unwrap().to_string(),
-            output_file: matches.value_of("OUTPUT").unwrap().to_string(),
             keep_even: matches.is_present("even"),
             keep_odd: matches.is_present("odd"),
             // These .map calls convert Option<&str> into Option<String>.
             keep_bitmap: matches.value_of("bitmap").map(String::from),
             keep_pattern: matches.value_of("pattern").map(String::from),
-            keep_primes: matches.value_of("keepprimes").map(String::from),
-            remove_primes: matches.value_of("removeprimes").map(String::from),
             protect_fundamental: matches.is_present("fundamental"),
             normalize: matches.is_present("normalize")
         };
