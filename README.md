@@ -3,8 +3,9 @@
 wavetool is a processing/analysis tool for Serum wavetables. It can generate
 pretty spectrograms from your wavetables like this:
 
+|                                           |                                            |
 |-------------------------------------------|--------------------------------------------|
-| ![Spectrum 1](/docs/images/spectrum_1.png)| ![Spectrum 2](/docs/images/spectrum_2.png) |
+| <img src="/docs/images/spectrum_1.png" height="100px" /> | ![Spectrum 2](/docs/images/spectrum_2.png) |
 ! ![Spectrum 3](/docs/images/spectrum_3.png) | ![Spectrum 4](/docs/images/spectrum_4.png) |
 
 - Generate a spectrogram from a wavetable.
