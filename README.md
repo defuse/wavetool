@@ -5,8 +5,8 @@ pretty spectrograms from your wavetables like this:
 
 |                                           |                                            |
 |-------------------------------------------|--------------------------------------------|
-| <img src="/docs/images/spectrum_1.png" height="100px" /> | ![Spectrum 2](/docs/images/spectrum_2.png) |
-! ![Spectrum 3](/docs/images/spectrum_3.png) | ![Spectrum 4](/docs/images/spectrum_4.png) |
+| <img src="/docs/images/spectrum_1.png" height="500px" /> | <img src="/docs/images/spectrum_2.png" height="500px" /> |
+| <img src="/docs/images/spectrum_3.png" height="500px" /> | <img src="/docs/images/spectrum_3.png" height="500px" /> |
 
 - Generate a spectrogram from a wavetable.
 - Filter a wavetable's harmonics in various ways:
