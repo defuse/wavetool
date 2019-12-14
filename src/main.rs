@@ -19,12 +19,12 @@ fn main() {
         (author: "Taylor Hornby <taylor@defuse.ca>")
         (about: "Serum wavetable editing / analysis tool.")
         (@subcommand spectrogram =>
-            (about: "Generates a spectrogram from a wavetable")
+            (about: "Generates a spectrogram from a wavetable.")
             (@arg INPUT: +required "The wavetable to analyze")
             (@arg phase: -p --phase "Include phase information as color")
         )
         (@subcommand factor =>
-            (about: "Factors a wavetable into its prime-multiple-of-fundamental components")
+            (about: "Factors a wavetable into its prime-multiple-of-fundamental components.")
             (@arg INPUT: +required "The wavetable to factor")
             (@arg normalize: -n --normalize "Normalize the outputs")
             (@arg shift: -s --shift "Shift harmonics down to the fundamental")
@@ -35,7 +35,7 @@ fn main() {
             (@arg INPUT: +required "The wavetable to be filtered")
             (@arg even: -e --even "Keep only the even harmonics")
             (@arg odd: -o --odd "Keep only the odd harmonics")
-            (@arg bitmap: -b --bitmap +takes_value "Keep only the harmonics specified by a bitmap.")
+            (@arg bitmap: -b --bitmap +takes_value "Keep only the harmonics specified by a bitmap")
             (@arg pattern: -p --pattern +takes_value "Repeat a bitmap up the spectrum")
             (@arg fundamental: -f --fundamental "Protect the fundamental (overrides other filters)")
             (@arg normalize: -n --normalize "Normalize the output")
