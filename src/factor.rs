@@ -94,6 +94,4 @@ pub fn run_factor(args: &FactorArgs) -> () {
             run_factor(&recursive_args);
         }
     }
-
-    // TODO: normalize
 }

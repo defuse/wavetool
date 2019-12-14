@@ -104,6 +104,11 @@ impl WaveTable {
         let mut chunks_writer = hound::ChunksWriter::new(buf_writer).unwrap();
         chunks_writer.write_fmt(spec).unwrap();
 
+        // FIXME: There's a flag in the clm section that tells Serum whether or not it's a default wavetable.
+        // FIXME: Make sure to unset that, so the wavetable will get saved inside the preset.
+
+        // FIXME: We should also write a default clm section if there wasn't one present.
+
         if let Some(clm_chunk) = &self.clm_chunk {
             println!("writing serum data");
             let mut writer = chunks_writer.start_chunk(['c' as u8, 'l' as u8, 'm' as u8, ' ' as u8]).unwrap();
