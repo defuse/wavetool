@@ -1,5 +1,7 @@
 # wavetool
 
+[![Build Status](https://travis-ci.org/defuse/wavetool.svg?branch=master)](https://travis-ci.org/defuse/wavetool)
+
 wavetool is a command-line processing/analysis tool for Serum wavetables. It can
 be used to edit wavetables in various ways. The currently supported features
 are:
