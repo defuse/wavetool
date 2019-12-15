@@ -18,6 +18,7 @@ fn main() {
         (version: "0.0.1")
         (author: "Taylor Hornby <taylor@defuse.ca>")
         (about: "Serum wavetable editing / analysis tool.")
+        (@setting ArgRequiredElseHelp)
         (@subcommand spectrogram =>
             (about: "Generates a spectrogram from a wavetable.")
             (@arg INPUT: +required "The wavetable to analyze")
