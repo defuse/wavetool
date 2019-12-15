@@ -21,3 +21,27 @@ wavetables like this:
 
 Amplitude information is encoded as brightness and phase information is encoded
 in the color hue.
+
+## Usage
+
+Building:
+
+```
+cargo build --release
+```
+
+To generate a spectrogram:
+
+```
+wavetool spectrogram -p /path/to/wavetable.wav
+```
+
+This will save the spectrogram to `/path/to/wavetable.wav.spectrum.png`.
+
+To apply a filter to a wavetable, e.g. specify a bitmap of harmonics to keep:
+
+```
+wavetool filter --bitmap 111000111000111000111000111 /path/to/wavetable.wav
+```
+
+The result will be saved to `/path/to/wavetable.wav.filtered.wav`.
