@@ -16,7 +16,7 @@ wavetables like this:
 
 <p align="center">
 <img src="/docs/images/spectrum_1.png" height="500px" /> <img src="/docs/images/spectrum_2.png" height="500px" />
-<img src="/docs/images/spectrum_3.png" height="500px" /> <img src="/docs/images/spectrum_4.png" height="500px" />
+<img src="/docs/images/spectrum_3.png" height="500px" />
 </p>
 
 Amplitude information is encoded as brightness and phase information is encoded
