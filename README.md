@@ -14,10 +14,10 @@ are:
 It can also generate cool-looking and informative spectrograms from your
 wavetables like this:
 
-|                                           |                                            |
-|-------------------------------------------|--------------------------------------------|
-| <img src="/docs/images/spectrum_1.png" height="500px" /> | <img src="/docs/images/spectrum_2.png" height="500px" /> |
-| <img src="/docs/images/spectrum_3.png" height="500px" /> | <img src="/docs/images/spectrum_4.png" height="500px" /> |
+<p align="center">
+<img src="/docs/images/spectrum_1.png" height="500px" /> <img src="/docs/images/spectrum_2.png" height="500px" />
+<img src="/docs/images/spectrum_3.png" height="500px" /> <img src="/docs/images/spectrum_4.png" height="500px" />
+</p>
 
 Amplitude information is encoded as brightness and phase information is encoded
 in the color hue.
