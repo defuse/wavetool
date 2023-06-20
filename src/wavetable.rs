@@ -37,13 +37,14 @@ impl WaveTable {
         let mut chunk_reader = hound::ChunksReader::new(buf_reader).unwrap();
 
         let mut clm_chunk: Option<Vec<u8>> = None;
+        let mut samples: Vec<f32> = vec![];
 
         // This only works if the 'clm ' chunk comes before the data.
         // FIXME: Fix that. I was running into problems with the borrow checker and gave up.
         while let Ok(Some(chunk)) = chunk_reader.next() {
             match chunk {
                 hound::Chunk::Data => {
-                    break;
+                    samples = chunk_reader.samples::<f32>().map(Result::unwrap).collect();
                 }
                 hound::Chunk::Fmt(_) => { },
                 hound::Chunk::Fact => { },
@@ -56,9 +57,6 @@ impl WaveTable {
                 }
             };
         }
-
-        // Will throw an error if the above loop didn't leave it in a data section
-        let samples: Vec<f32> = chunk_reader.samples::<f32>().map(Result::unwrap).collect();
 
         // I'm basically copying the implementation of WavReader here.
         if let Some(spec_ex) = chunk_reader.spec_ex {
