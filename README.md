@@ -16,9 +16,10 @@ are:
 It can also generate cool-looking and informative spectrograms from your
 wavetables like this:
 
-![spectrum 1](https://raw.githubusercontent.com/defuse/wavetool/master/docs/images/spectrum_1.png)
-![spectrum 2](https://raw.githubusercontent.com/defuse/wavetool/master/docs/images/spectrum_2.png)
-![spectrum 3](https://raw.githubusercontent.com/defuse/wavetool/master/docs/images/spectrum_3.png)
+<p align="center">
+<img src="https://raw.githubusercontent.com/defuse/wavetool/master/docs/images/spectrum_1.png" height="500px" /> <img src="https://raw.githubusercontent.com/defuse/wavetool/master/docs/images/spectrum_2.png" height="500px" />
+<img src="https://raw.githubusercontent.com/defuse/wavetool/master/docs/images/spectrum_3.png" height="500px" />
+</p>
 
 Amplitude information is encoded as brightness and phase information is encoded
 in the color hue.
